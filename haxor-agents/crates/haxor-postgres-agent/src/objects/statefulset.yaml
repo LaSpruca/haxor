@@ -1,0 +1,38 @@
+metadata:
+  name: haxor-postgres
+  namespace: haxor
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: postgres
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: postgres
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+        - name: postgres
+          image: postgres
+          ports:
+            - name: postgres
+              containerPort: 5432
+          env:
+            - name: POSTGRES_INITDB
+              value: postgres
+            - name: POSTGRES_USER
+              value: postgres
+            - name: POSTGRES_PASSWORD
+              secretKeyRef:
+                name: postgres-password
+                key: postgres-password
+    volumeClaimTemplates:
+      metadata:
+        name: data
+      spec:
+        access_modes: ["ReadWriteOnce"]
+        resources:
+          requests:
+            storage: 10Gi
+      

@@ -1,0 +1,48 @@
+apiVersion: haxor.laspruca.nz/v1
+kind: Database
+metadata:
+  name: database
+  namespace: haxor-{{ .Values.projectId }}
+  labels:
+    haxor.laspruca.nz/provider: postgres
+    haxor.laspruca.nz/projectId: {{ .Values.projectId }}
+spec:
+  users:
+    - name: postgres
+      role: builtin:admin
+---
+apiVersion: haxor.laspruca.nz/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: haxor-{{ .Values.projectId }}
+  labels:
+    haxor.laspruca.nz/projectId: {{ .Values.projectId }}
+spec:
+  image: images.haxor.cluster.local/haxor-{{ .Values.projectId }}/backend
+  env:
+    - name: DB_URL
+      ref: database:connectionString:postgres
+    - name: CORS_URL
+      ref: frontend:expose:8000:host
+  expose:
+    8080:
+      host: todo.laspruca.nz
+      tls: true
+---
+apiVersion: haxor.laspruca.nz/v1
+kind: Deployment
+metadata:
+  name: frontend
+  namespace: haxor-{{ .Values.projectId }}
+  labels:
+    haxor.laspruca.nz/projectId: {{ .Values.projectId }}
+spec:
+  image: images.haxor.cluster.local/haxor-{{ .Values.projcetId }}/frontend
+  env:
+    - name: VITE_API_URL
+      ref: backend:expose:8080:host
+  expose:
+    8000:
+      host: todo.laspruca.nz
+      tls: true
