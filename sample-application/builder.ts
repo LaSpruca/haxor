@@ -1,4 +1,4 @@
-import { database, deployment, fileServe } from "@haxor/core";
+import { database, deployment } from "@haxor/core";
 
 const db = database("database")
   .provider("postgres")

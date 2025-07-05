@@ -4,7 +4,7 @@ metadata:
   name: database
   namespace: haxor-{{ .Values.projectId }}
   labels:
-    haxor.laspruca.nz/provider: postgres
+    haxor.laspruca.nz/db/provider: postgres
     haxor.laspruca.nz/projectId: {{ .Values.projectId }}
 spec:
   users:
