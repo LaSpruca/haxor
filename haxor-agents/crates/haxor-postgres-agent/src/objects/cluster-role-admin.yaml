@@ -1,0 +1,13 @@
+apiVersion: nz.laspruca.haxor/v1
+kind: ClusterDatabaseRole
+metadata:
+  name: admin
+  labels:
+    nz.laspruca.haxor/db: postgres
+spec: 
+  apply: |
+    GRANT CONNECT ON DATABASE {{ database }} TO {{ user }};
+    GRANT ALL ON SCHEMA public TO {{ user }};
+  revoke: |
+    REVOKE ALL ON SCHEMA public TO {{ user }};
+    REVOKE CONNECT ON DATABASE {{ database }} TO {{ user }};

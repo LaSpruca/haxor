@@ -9,12 +9,9 @@ use k8s_openapi::{
 };
 use kube::{core::ErrorResponse, Api, Client};
 use rand::{distr::Alphanumeric, Rng};
-use tera::{Context, Tera};
 use tracing::{debug, error, info, span, Level};
 
-const SECRET_STR: &'static str = include_str!("./objects/secret.yaml");
-const SERVICE_STR: &'static str = include_str!("./objects/service.yaml");
-const STATEFUL_SET_STR: &'static str = include_str!("./objects/statefulset.yaml");
+use crate::templates;
 
 pub struct DeploymentManager {
     client: Client,
@@ -79,11 +76,8 @@ impl DeploymentManager {
         let encoded_password = BASE64_STANDARD.encode(&password);
 
         // Therotically templating here should not fail
-        let mut context = Context::new();
-        context.insert("password", &encoded_password);
-        let password_secret_str = Tera::default()
-            .render_str(SECRET_STR, &context)
-            .expect("Could not template out string");
+        let password_secret_str = templates::root_password_secret(encoded_password.as_str())
+            .expect("FAITAL: Could not render the postgres password");
 
         let password_secret: Secret =
             serde_yaml::from_str(&password_secret_str).expect("Could not parse password secret");
@@ -124,10 +118,14 @@ impl DeploymentManager {
             }
         };
 
+        let service_str = templates::service().expect("Could not render service template");
+        let stateful_set_str =
+            templates::stateful_set().expect("Could not render service template");
+
         // We expect here because this should never fail in the actual environment
-        let service = serde_yaml::from_str(SERVICE_STR).expect("Invalid service.yaml");
+        let service = serde_yaml::from_str(&service_str).expect("Invalid service.yaml");
         let stateful_set =
-            serde_yaml::from_str(STATEFUL_SET_STR).expect("Invalid statufulservice.yaml");
+            serde_yaml::from_str(&stateful_set_str).expect("Invalid statufulservice.yaml");
 
         match services.create(&Default::default(), &service).await {
             Ok(_) => {}

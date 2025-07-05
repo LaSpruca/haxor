@@ -10,6 +10,7 @@ spec:
     metadata:
       labels:
         app.kubernetes.io/name: postgres
+        nz.laspruca.haxor/provides/db: postgres
     spec:
       terminationGracePeriodSeconds: 10
       containers:

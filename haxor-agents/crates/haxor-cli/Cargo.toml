@@ -5,3 +5,7 @@ edition = "2024"
 
 [dependencies]
 haxor-core = { path = "../haxor-core" }
+tokio.workspace = true
+kube = { workspace = true, features = ["client"] }
+k8s-openapi.workspace = true
+clap = { version = "4.5.40", features = ["derive"] }

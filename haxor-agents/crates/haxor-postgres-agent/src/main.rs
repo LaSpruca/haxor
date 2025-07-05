@@ -5,6 +5,7 @@ use tracing::{debug, error, span, Level};
 use tracing_subscriber::{fmt, layer::SubscriberExt, util::SubscriberInitExt as _, EnvFilter};
 
 mod deployment_manager;
+mod templates;
 
 #[tokio::main]
 async fn main() -> ExitCode {
@@ -12,6 +13,7 @@ async fn main() -> ExitCode {
         .with(fmt::layer())
         .with(EnvFilter::from_default_env())
         .init();
+
     span!(Level::TRACE, "haxor-postgres-agent::main");
 
     let client = match Client::try_default().await {
